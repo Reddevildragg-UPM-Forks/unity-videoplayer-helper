@@ -1,0 +1,18 @@
+{
+  "name": "com.janniklassahn.unity-videoplayer-helper",
+  "displayName": "Unity Video Player Helper",
+  "description": "Simple helper for the Video Player in Unity",
+  "version": "0.1.101",
+  "unity": "2018.1",
+  "license": null,
+  "author": {
+    "name": "Jannik Lassahn",
+    "email": null,
+    "url": null
+  },
+  "repository": null,
+  "bugs": null,
+  "homepage": null,
+  "dependencies": {},
+  "publishDate": "2020-09-22T14:44:46.9921124Z"
+}
