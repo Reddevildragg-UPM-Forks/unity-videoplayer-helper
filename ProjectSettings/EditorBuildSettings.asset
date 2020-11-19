@@ -6,5 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Examples/Scenes/YouTube Player.unity
+    path: Assets/VideoPlayer Helper/Samples/Examples/Scenes/YouTube Player.unity
     guid: f5b4edcdda0b56042849812e2d95ade6
+  m_configObjects: {}
