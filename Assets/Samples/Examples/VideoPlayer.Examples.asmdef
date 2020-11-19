@@ -1,15 +1,14 @@
 {
     "name": "VideoPlayer.Examples",
     "references": [
-        "GUID:0a87e15de6e040a4a9e6c793fdeae5fd"
+        "VideoPlayer"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "defineConstraints": []
 }

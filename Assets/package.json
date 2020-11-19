@@ -14,5 +14,12 @@
   "bugs": null,
   "homepage": null,
   "dependencies": {},
-  "publishDate": "2020-09-22T14:44:46.9921124Z"
+  "publishDate": "2020-09-22T14:44:46.9921124Z",
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "Examples",
+      "path": "Samples~/Example"
+    }  
+  ]
 }
