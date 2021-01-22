@@ -43,6 +43,15 @@ namespace Unity.VideoHelper
         #region Properties
 
         /// <summary>
+        /// Returns the attached Video Player
+        /// </summary>
+        public VideoPlayer VideoPlayer
+        {
+            get => videoPlayer;
+            set => videoPlayer = value;
+        }
+		
+        /// <summary>
         /// Gets or sets whether to automatically start playing the video after it is prepared.
         /// </summary>
         public bool StartAfterPreparation
@@ -211,6 +220,14 @@ namespace Unity.VideoHelper
         public void Pause()
         {
             videoPlayer.Pause();
+        }
+		
+		/// <summary>
+        /// Stop the player
+        /// </summary>
+        public void Stop()
+        {
+            videoPlayer.Stop();
         }
 
         /// <summary>
