@@ -116,8 +116,11 @@ namespace Unity.VideoHelper
             Screen.gameObject.AddComponent<DirectClickRouter>();
 #endif
 
-            Screen.OnDoubleClick(ToggleFullscreen);
-            Screen.OnClick(ToggleIsPlaying);
+            if (Screen != null)
+            {
+                Screen.OnDoubleClick(ToggleFullscreen);
+                Screen.OnClick(ToggleIsPlaying);
+            }
 
             ControlsPanel.SetGameObjectActive(false);
             LoadingIndicator.SetGameObjectActive(false);
@@ -134,6 +137,13 @@ namespace Unity.VideoHelper
                 else
                     return -1;
             });
+        }
+        
+        void AssignScreen(Transform newScreen)
+        {
+          Screen = newScreen
+          Screen.OnDoubleClick(ToggleFullscreen);
+          Screen.OnClick(ToggleIsPlaying);
         }
 
         private void Update()
