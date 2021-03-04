@@ -141,7 +141,7 @@ namespace Unity.VideoHelper
         
         void AssignScreen(Transform newScreen)
         {
-          Screen = newScreen
+            Screen = newScreen;
           Screen.OnDoubleClick(ToggleFullscreen);
           Screen.OnClick(ToggleIsPlaying);
         }
