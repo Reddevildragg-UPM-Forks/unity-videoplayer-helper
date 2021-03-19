@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+
+#endregion
 
 namespace Unity.VideoHelper
 {
@@ -13,30 +17,31 @@ namespace Unity.VideoHelper
     }
 
     /// <summary>
-    /// Handles UI state for the video player.
+    ///     Handles UI state for the video player.
     /// </summary>
     [RequireComponent(typeof(VideoController))]
     public class VideoPresenter : MonoBehaviour, ITimelineProvider
     {
-        #region Consts
+#region Consts
 
-        private const string MinutesFormat = "{0:00}:{1:00}";
-        private const string HoursFormat = "{0:00}:{1:00}:{2:00}";
+        const string MinutesFormat = "{0:00}:{1:00}";
+        const string HoursFormat = "{0:00}:{1:00}:{2:00}";
 
-        #endregion
+#endregion
 
-        #region Private Fields
+#region Private Fields
 
-        private IDisplayController display;
-        private VideoController controller;
-        private float previousVolume;
+        IDisplayController display;
+        VideoController controller;
+        float previousVolume;
 
-        #endregion
+#endregion
 
-        #region Public Fields
+#region Public Fields
 
         [Header("Controls")]
         public Transform Screen;
+
         public Transform ControlsPanel;
         public Transform LoadingIndicator;
         public Transform Thumbnail;
@@ -49,35 +54,36 @@ namespace Unity.VideoHelper
         public Text Duration;
 
         [SerializeField]
-        private int targetDisplay = 0;
+        int targetDisplay;
 
         [Header("Input")]
-
         public KeyCode FullscreenKey = KeyCode.F;
+
         public KeyCode WindowedKey = KeyCode.Escape;
         public KeyCode TogglePlayKey = KeyCode.Space;
 
         [Space(10)]
         public bool ToggleScreenOnDoubleClick = true;
+
         public bool TogglePlayPauseOnClick = true;
 
         [Header("Content")]
-
         public Sprite Play;
+
         public Sprite Pause;
 
         public Sprite Normal;
         public Sprite Fullscreen;
-        
+
         public VolumeInfo[] Volumes = new VolumeInfo[0];
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         public int TargetDisplay
         {
-            get { return targetDisplay; }
+            get => targetDisplay;
             set
             {
                 targetDisplay = value;
@@ -85,11 +91,11 @@ namespace Unity.VideoHelper
             }
         }
 
-        #endregion
+#endregion
 
-        #region Unity methods
+#region Unity methods
 
-        private void Start()
+        void Start()
         {
             controller = GetComponent<VideoController>();
 
@@ -131,27 +137,34 @@ namespace Unity.VideoHelper
             Array.Sort(Volumes, (v1, v2) =>
             {
                 if (v1.Minimum > v2.Minimum)
+                {
                     return 1;
-                else if (v1.Minimum == v2.Minimum)
+                }
+
+                if (v1.Minimum == v2.Minimum)
+                {
                     return 0;
-                else
-                    return -1;
+                }
+
+                return -1;
             });
         }
-        
+
         void AssignScreen(Transform newScreen)
         {
             Screen = newScreen;
-          Screen.OnDoubleClick(ToggleFullscreen);
-          Screen.OnClick(ToggleIsPlaying);
+            Screen.OnDoubleClick(ToggleFullscreen);
+            Screen.OnClick(ToggleIsPlaying);
         }
 
-        private void Update()
+        void Update()
         {
             CheckKeys();
 
             if (controller.IsPlaying)
+            {
                 Timeline.Position = controller.NormalizedTime;
+            }
         }
 
 #endregion
@@ -163,10 +176,12 @@ namespace Unity.VideoHelper
 
 #region Private methods
 
-        private void ToggleMute()
+        void ToggleMute()
         {
             if (Volume.value == 0)
+            {
                 Volume.value = previousVolume;
+            }
             else
             {
                 previousVolume = Volume.value;
@@ -174,29 +189,31 @@ namespace Unity.VideoHelper
             }
         }
 
-        private void Prepare()
+        void Prepare()
         {
             Thumbnail.SetGameObjectActive(false);
             LoadingIndicator.SetGameObjectActive(true);
         }
 
-        private void CheckKeys()
+        void CheckKeys()
         {
             if (Input.GetKeyDown(FullscreenKey))
             {
                 display.ToFullscreen(gameObject.transform as RectTransform);
             }
+
             if (Input.GetKeyDown(WindowedKey))
             {
                 display.ToNormal();
             }
+
             if (Input.GetKeyDown(TogglePlayKey))
             {
                 ToggleIsPlaying();
             }
         }
 
-        private void ToggleIsPlaying()
+        void ToggleIsPlaying()
         {
             if (controller.IsPlaying)
             {
@@ -210,14 +227,16 @@ namespace Unity.VideoHelper
             }
         }
 
-        private void OnStartedPlaying()
+        void OnStartedPlaying()
         {
             Screen.SetGameObjectActive(true);
             ControlsPanel.SetGameObjectActive(true);
             LoadingIndicator.SetGameObjectActive(false);
 
-            if(Duration != null)
+            if (Duration != null)
+            {
                 Duration.text = PrettyTimeFormat(TimeSpan.FromSeconds(controller.Duration));
+            }
 
             StartCoroutine(SetCurrentPosition());
 
@@ -226,14 +245,14 @@ namespace Unity.VideoHelper
             PlayPause.sprite = Pause;
         }
 
-        private void OnVolumeChanged(float volume)
+        void OnVolumeChanged(float volume)
         {
             controller.Volume = volume;
 
             for (int i = 0; i < Volumes.Length; i++)
             {
-                var current = Volumes[i];
-                var next = Volumes.Length - 1 >= i + 1 ? Volumes[i + 1].Minimum : 2;
+                VolumeInfo current = Volumes[i];
+                float next = Volumes.Length - 1 >= i + 1 ? Volumes[i + 1].Minimum : 2;
 
                 if (current.Minimum <= volume && next > volume)
                 {
@@ -242,7 +261,7 @@ namespace Unity.VideoHelper
             }
         }
 
-        private void ToggleFullscreen()
+        void ToggleFullscreen()
         {
             if (display.IsFullscreen)
             {
@@ -256,26 +275,29 @@ namespace Unity.VideoHelper
             }
         }
 
-        private IEnumerator SetCurrentPosition()
+        IEnumerator SetCurrentPosition()
         {
             while (controller.IsPlaying)
             {
                 if (Current != null)
+                {
                     Current.text = PrettyTimeFormat(TimeSpan.FromSeconds(controller.Time));
+                }
 
                 yield return new WaitForSeconds(1);
             }
         }
 
-        private string PrettyTimeFormat(TimeSpan time)
+        string PrettyTimeFormat(TimeSpan time)
         {
             if (time.TotalHours <= 1)
+            {
                 return string.Format(MinutesFormat, time.Minutes, time.Seconds);
-            else
-                return string.Format(HoursFormat, time.Hours, time.Minutes, time.Seconds);
+            }
+
+            return string.Format(HoursFormat, time.Hours, time.Minutes, time.Seconds);
         }
 
 #endregion
     }
 }
-
