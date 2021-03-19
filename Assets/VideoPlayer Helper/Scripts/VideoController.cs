@@ -2,57 +2,62 @@
 #define VIDEOPLAYER_DEBUG
 #endif
 
+#region
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
+#endregion
+
 namespace Unity.VideoHelper
 {
-
     public class VideoController : MonoBehaviour
     {
-        #region Fields
+#region Fields
 
         [SerializeField]
-        private RawImage screen;
+        RawImage screen;
 
         [SerializeField]
-        private bool startAfterPreparation = true;
+        bool startAfterPreparation = true;
 
         [Header("Optional")]
+        [SerializeField]
+        VideoPlayer videoPlayer;
 
         [SerializeField]
-        private VideoPlayer videoPlayer;
-
-        [SerializeField]
-        private AudioSource audioSource;
+        AudioSource audioSource;
 
         [Header("Events")]
         [SerializeField]
-        private UnityEvent onPrepared = new UnityEvent();
+        UnityEvent onPrepared = new UnityEvent();
 
         [SerializeField]
-        private UnityEvent onStartedPlaying = new UnityEvent();
+        UnityEvent onStartedPlaying = new UnityEvent();
 
         [SerializeField]
-        private UnityEvent onFinishedPlaying = new UnityEvent();
+        UnityEvent onFinishedPlaying = new UnityEvent();
 
-        #endregion
+        public UnityAction onPausedPlaying;
+        public UnityAction onStoppedPlaying;
 
-        #region Properties
+#endregion
+
+#region Properties
 
         /// <summary>
-        /// Returns the attached Video Player
+        ///     Returns the attached Video Player
         /// </summary>
         public VideoPlayer VideoPlayer
         {
             get => videoPlayer;
             set => videoPlayer = value;
         }
-		
+
         /// <summary>
-        /// Gets or sets whether to automatically start playing the video after it is prepared.
+        ///     Gets or sets whether to automatically start playing the video after it is prepared.
         /// </summary>
         public bool StartAfterPreparation
         {
@@ -61,31 +66,31 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Gets a value between 0 and 1 that represents the video position.
+        ///     Gets a value between 0 and 1 that represents the video position.
         /// </summary>
         public float NormalizedTime
         {
-            get { return (float)(videoPlayer.time / Duration); }
+            get { return (float) (videoPlayer.time / Duration); }
         }
 
         /// <summary>
-        /// Gets the duration of the video in seconds.
+        ///     Gets the duration of the video in seconds.
         /// </summary>
         public ulong Duration
         {
-            get { return videoPlayer.frameCount / (ulong)videoPlayer.frameRate; }
+            get { return videoPlayer.frameCount / (ulong) videoPlayer.frameRate; }
         }
 
         /// <summary>
-        /// Gets the current time in seconds.
+        ///     Gets the current time in seconds.
         /// </summary>
         public ulong Time
         {
-            get { return (ulong)videoPlayer.time; }
+            get { return (ulong) videoPlayer.time; }
         }
 
         /// <summary>
-        /// Gets whether the player prepared buffer for smooth playback.
+        ///     Gets whether the player prepared buffer for smooth playback.
         /// </summary>
         public bool IsPrepared
         {
@@ -93,7 +98,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Gets whether the video is playing.
+        ///     Gets whether the video is playing.
         /// </summary>
         public bool IsPlaying
         {
@@ -101,7 +106,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Gets or sets the volume of the audio source.
+        ///     Gets or sets the volume of the audio source.
         /// </summary>
         public float Volume
         {
@@ -109,14 +114,18 @@ namespace Unity.VideoHelper
             set
             {
                 if (audioSource == null)
+                {
                     videoPlayer.SetDirectAudioVolume(0, value);
+                }
                 else
+                {
                     audioSource.volume = value;
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets the image to show the video.
+        ///     Gets or sets the image to show the video.
         /// </summary>
         public RawImage Screen
         {
@@ -126,7 +135,7 @@ namespace Unity.VideoHelper
 
 
         /// <summary>
-        /// Fired when the video is prepared for playback.
+        ///     Fired when the video is prepared for playback.
         /// </summary>
         public UnityEvent OnPrepared
         {
@@ -134,7 +143,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Fired when the player started to play.
+        ///     Fired when the player started to play.
         /// </summary>
         public UnityEvent OnStartedPlaying
         {
@@ -142,28 +151,28 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Fired when the video is finished.
+        ///     Fired when the video is finished.
         /// </summary>
         public UnityEvent OnFinishedPlaying
         {
             get { return onFinishedPlaying; }
         }
 
-        #endregion
+#endregion
 
-        #region Unity methods
+#region Unity methods
 
-        private void OnEnable()
+        void OnEnable()
         {
             SubscribeToVideoPlayerEvents();
         }
 
-        private void OnDisable()
+        void OnDisable()
         {
             UnsubscribeFromVideoPlayerEvents();
         }
 
-        private void Start()
+        void Start()
         {
             if (videoPlayer == null)
             {
@@ -174,12 +183,12 @@ namespace Unity.VideoHelper
             videoPlayer.playOnAwake = false;
         }
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         /// <summary>
-        /// Prepares the video player for the URL.
+        ///     Prepares the video player for the URL.
         /// </summary>
         /// <param name="url">The video URL.</param>
         public void PrepareForUrl(string url)
@@ -190,7 +199,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Prepares the player for a video clip.
+        ///     Prepares the player for a video clip.
         /// </summary>
         /// <param name="clip">The clip.</param>
         public void PrepareForClip(VideoClip clip)
@@ -201,7 +210,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Plays a prepared video.
+        ///     Plays a prepared video.
         /// </summary>
         public void Play()
         {
@@ -215,34 +224,40 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Pauses the player.
+        ///     Pauses the player.
         /// </summary>
         public void Pause()
         {
+            onPausedPlaying?.Invoke();
             videoPlayer.Pause();
         }
-		
-		/// <summary>
-        /// Stop the player
+
+        /// <summary>
+        ///     Stop the player
         /// </summary>
         public void Stop()
         {
+            onStoppedPlaying?.Invoke();
             videoPlayer.Stop();
         }
 
         /// <summary>
-        /// Plays or pauses the video.
+        ///     Plays or pauses the video.
         /// </summary>
         public void TogglePlayPause()
         {
             if (IsPlaying)
+            {
                 Pause();
+            }
             else
+            {
                 Play();
+            }
         }
 
         /// <summary>
-        /// Sets the playback speed.
+        ///     Sets the playback speed.
         /// </summary>
         /// <param name="speed">The speed, e.g. 0.5 for half the normal speed.</param>
         public void SetPlaybackSpeed(float speed)
@@ -251,7 +266,7 @@ namespace Unity.VideoHelper
         }
 
         /// <summary>
-        /// Jumps to the specified time in the video.
+        ///     Jumps to the specified time in the video.
         /// </summary>
         /// <param name="time">The normalized time.</param>
         public void Seek(float time)
@@ -260,21 +275,21 @@ namespace Unity.VideoHelper
             videoPlayer.time = time * Duration;
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
-        private void OnStarted(VideoPlayer source)
+        void OnStarted(VideoPlayer source)
         {
             onStartedPlaying.Invoke();
         }
 
-        private void OnFinished(VideoPlayer source)
+        void OnFinished(VideoPlayer source)
         {
             onFinishedPlaying.Invoke();
         }
 
-        private void OnPrepareCompleted(VideoPlayer source)
+        void OnPrepareCompleted(VideoPlayer source)
         {
             onPrepared.Invoke();
             screen.texture = videoPlayer.texture;
@@ -287,22 +302,26 @@ namespace Unity.VideoHelper
             SetupScreenAspectRatio();
 
             if (StartAfterPreparation)
+            {
                 Play();
+            }
         }
 
-        private void SetupScreenAspectRatio()
+        void SetupScreenAspectRatio()
         {
-            var fitter = screen.gameObject.GetOrAddComponent<AspectRatioFitter>();
+            AspectRatioFitter fitter = screen.gameObject.GetOrAddComponent<AspectRatioFitter>();
             fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
-            fitter.aspectRatio = (float)videoPlayer.texture.width / videoPlayer.texture.height;
+            fitter.aspectRatio = (float) videoPlayer.texture.width / videoPlayer.texture.height;
         }
 
-        private void SetupAudio()
+        void SetupAudio()
         {
             if (videoPlayer.audioTrackCount <= 0)
+            {
                 return;
+            }
 
-            if(audioSource == null && videoPlayer.canSetDirectAudioVolume)
+            if (audioSource == null && videoPlayer.canSetDirectAudioVolume)
             {
                 videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
             }
@@ -311,21 +330,24 @@ namespace Unity.VideoHelper
                 videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
                 videoPlayer.SetTargetAudioSource(0, audioSource);
             }
+
             videoPlayer.controlledAudioTrackCount = 1;
             videoPlayer.EnableAudioTrack(0, true);
         }
 
-        private void OnError(VideoPlayer source, string message)
+        void OnError(VideoPlayer source, string message)
         {
 #if VIDEOPLAYER_DEBUG
             Debug.LogError("[Video Controller] " + message);
 #endif
         }
 
-        private void SubscribeToVideoPlayerEvents()
+        void SubscribeToVideoPlayerEvents()
         {
             if (videoPlayer == null)
+            {
                 return;
+            }
 
             videoPlayer.errorReceived += OnError;
             videoPlayer.prepareCompleted += OnPrepareCompleted;
@@ -333,10 +355,12 @@ namespace Unity.VideoHelper
             videoPlayer.loopPointReached += OnFinished;
         }
 
-        private void UnsubscribeFromVideoPlayerEvents()
+        void UnsubscribeFromVideoPlayerEvents()
         {
             if (videoPlayer == null)
+            {
                 return;
+            }
 
             videoPlayer.errorReceived -= OnError;
             videoPlayer.prepareCompleted -= OnPrepareCompleted;
@@ -344,8 +368,6 @@ namespace Unity.VideoHelper
             videoPlayer.loopPointReached -= OnFinished;
         }
 
-        #endregion
-
+#endregion
     }
-
 }
