@@ -42,6 +42,9 @@ namespace Unity.VideoHelper
 
         public UnityAction onPausedPlaying;
         public UnityAction onStoppedPlaying;
+        
+               [HideInInspector]
+                public bool hasAudio;
 
 #endregion
 
@@ -318,9 +321,11 @@ namespace Unity.VideoHelper
         {
             if (videoPlayer.audioTrackCount <= 0)
             {
+                hasAudio = false;
                 return;
             }
 
+            hasAudio = true;
             if (audioSource == null && videoPlayer.canSetDirectAudioVolume)
             {
                 videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
