@@ -43,9 +43,9 @@ namespace Unity.VideoHelper
         public UnityAction onPausedPlaying;
         public UnityAction onStoppedPlaying;
         
-               [HideInInspector]
-                public bool hasAudio;
-
+        //callback once audio is set up as this happens after prepare is complete
+        public UnityAction<bool> audioSetupComplete;
+        
 #endregion
 
 #region Properties
@@ -321,11 +321,10 @@ namespace Unity.VideoHelper
         {
             if (videoPlayer.audioTrackCount <= 0)
             {
-                hasAudio = false;
+                audioSetupComplete?.Invoke(false);
                 return;
             }
 
-            hasAudio = true;
             if (audioSource == null && videoPlayer.canSetDirectAudioVolume)
             {
                 videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
@@ -338,6 +337,8 @@ namespace Unity.VideoHelper
 
             videoPlayer.controlledAudioTrackCount = 1;
             videoPlayer.EnableAudioTrack(0, true);
+            
+            audioSetupComplete?.Invoke(true);
         }
 
         void OnError(VideoPlayer source, string message)
